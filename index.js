@@ -40,6 +40,7 @@ async function run() {
     await client.connect();
     const userCollection = client.db("aitch-s-light").collection("user");
     const reviewcollection = client.db("aitch-s-light").collection("reviews");
+    const productcollection = client.db("aitch-s-light").collection("products");
     // save user---------------------------------------------------------------------------
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -78,7 +79,7 @@ async function run() {
     });
 
     // ger all user---------------------------------------------------------------------------
-    app.get("/user", verifyJWT, async (req, res) => {
+    app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
@@ -123,13 +124,20 @@ async function run() {
       const Review = await reviewcollection.insertOne(newReview);
       res.send(Review);
     });
-    // Add A Review ---------------------------------------------------------------------------
+    // get A Review ---------------------------------------------------------------------------
     app.get("/review", async (req, res) => {
       const query = req.query;
       const cursor = reviewcollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
+    // Add  products ---------------------------------------------------------------------------
+    app.post("/product", verifyJWT, async (req, res) => {
+      const newproducts = req.body;
+      const products = await productcollection.insertOne(newproducts);
+      res.send(products);
+    });
+
     // ---------------------------------------------------------------------------
   } finally {
     // await client.close();
