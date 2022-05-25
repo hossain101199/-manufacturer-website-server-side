@@ -46,7 +46,10 @@ async function run() {
       const filter = { email: email };
       const options = { upsert: true };
       const updateDoc = {
-        $set: user,
+        $set: {
+          user,
+          role: "user",
+        },
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign(
@@ -77,7 +80,7 @@ async function run() {
     });
 
     // ger all user---------------------------------------------------------------------------
-    app.get("/user", verifyJWT, async (req, res) => {
+    app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
@@ -89,6 +92,31 @@ async function run() {
         $set: { role: "admin" },
       };
       const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    // userInformation---------------------------------------------------------------------------
+    app.put("/userInformation/:email", async (req, res) => {
+      const email = req.params.email;
+      const userInformation = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      console.log(filter);
+      console.log(userInformation.name);
+      const updatedDoc = {
+        $set: {
+          name: userInformation.name,
+          email: userInformation.email,
+          phone: userInformation.phone,
+          linkedin: userInformation.linkedin,
+          education: userInformation.education,
+          address: userInformation.address,
+        },
+      };
+      const result = await userCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
       res.send(result);
     });
 
