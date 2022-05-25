@@ -46,10 +46,7 @@ async function run() {
       const filter = { email: email };
       const options = { upsert: true };
       const updateDoc = {
-        $set: {
-          user,
-          role: "user",
-        },
+        $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign(
@@ -105,7 +102,6 @@ async function run() {
       const updatedDoc = {
         $set: {
           name: userInformation.name,
-          email: userInformation.email,
           phone: userInformation.phone,
           linkedin: userInformation.linkedin,
           education: userInformation.education,
