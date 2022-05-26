@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -138,6 +138,36 @@ async function run() {
       res.send(products);
     });
 
+    // Product count --------------------------------------------------------------------------
+    app.get("/productCount", async (req, res) => {
+      const products = await productcollection.estimatedDocumentCount();
+      res.send({ products });
+    });
+
+    // get products---------------------------------------------------------------------------
+    app.get("/products", async (req, res) => {
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      const query = {};
+      const cursor = productcollection.find(query);
+      let products;
+      if (page || size) {
+        products = await cursor
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+      } else {
+        products = await cursor.toArray();
+      }
+      res.send(products);
+    });
+    // get one api ---------------------------------------------------------------------------
+    app.get("/product/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await productcollection.findOne(query);
+      res.send(product);
+    });
     // ---------------------------------------------------------------------------
   } finally {
     // await client.close();
