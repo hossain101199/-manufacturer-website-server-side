@@ -162,6 +162,13 @@ async function run() {
       }
       res.send(products);
     });
+    // get  product ---------------------------------------------------------------------------
+    app.get("/products", async (req, res) => {
+      const query = req.query;
+      const cursor = productcollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
     // get one api ---------------------------------------------------------------------------
     app.get("/product/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
@@ -169,6 +176,14 @@ async function run() {
       const product = await productcollection.findOne(query);
       res.send(product);
     });
+    // Delete order -----------------------------------------------------------------------
+    app.delete("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const products = await productcollection.deleteOne(query);
+      res.send(products);
+    });
+
     // Add  Orders ---------------------------------------------------------------------------
     app.post("/orders", verifyJWT, async (req, res) => {
       const Order = req.body;
