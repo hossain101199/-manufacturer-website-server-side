@@ -41,6 +41,7 @@ async function run() {
     const userCollection = client.db("aitch-s-light").collection("user");
     const reviewcollection = client.db("aitch-s-light").collection("reviews");
     const productcollection = client.db("aitch-s-light").collection("products");
+    const Ordercollection = client.db("aitch-s-light").collection("Orders");
     // save user---------------------------------------------------------------------------
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -124,7 +125,7 @@ async function run() {
       const Review = await reviewcollection.insertOne(newReview);
       res.send(Review);
     });
-    // get A Review ---------------------------------------------------------------------------
+    // get  Review ---------------------------------------------------------------------------
     app.get("/review", async (req, res) => {
       const query = req.query;
       const cursor = reviewcollection.find(query);
@@ -168,6 +169,27 @@ async function run() {
       const product = await productcollection.findOne(query);
       res.send(product);
     });
+    // Add  Orders ---------------------------------------------------------------------------
+    app.post("/orders", verifyJWT, async (req, res) => {
+      const Order = req.body;
+      const newOrder = await Ordercollection.insertOne(Order);
+      res.send(newOrder);
+    });
+    // get  Orders ---------------------------------------------------------------------------
+    app.get("/orders", verifyJWT, async (req, res) => {
+      const query = req.query;
+      const cursor = Ordercollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // Delete order -----------------------------------------------------------------------
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const products = await Ordercollection.deleteOne(query);
+      res.send(products);
+    });
+
     // ---------------------------------------------------------------------------
   } finally {
     // await client.close();
