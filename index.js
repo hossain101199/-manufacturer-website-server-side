@@ -191,11 +191,18 @@ async function run() {
       res.send(newOrder);
     });
     // get  Orders ---------------------------------------------------------------------------
-    app.get("/orders", verifyJWT, async (req, res) => {
+    app.get("/orders", async (req, res) => {
       const query = req.query;
       const cursor = Ordercollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
+    });
+    // get one order -----------------------------------------------------------------------
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await Ordercollection.findOne(query);
+      res.send(product);
     });
     // Delete order -----------------------------------------------------------------------
     app.delete("/orders/:id", async (req, res) => {
